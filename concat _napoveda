@@ -1,0 +1,10 @@
+
+Použití parametrů axis=0 a join="inner" ve funkci pd.concat má specifické chování:
+
+axis=0 značí, že sloučení (concatenation) bude prováděno podél osy indexu (vertikálně). To znamená, že pandas pokusí se spojit řádky obou DataFrameů do jednoho. Můžete si to představit tak, že druhý DataFrame je připojen pod první DataFrame.
+
+join="inner" v kontextu pd.concat s axis=0 je trochu méně intuitivní, protože join="inner" a join="outer" mají zřetelný význam hlavně při spojování podél sloupců (axis=1). V dokumentaci pandas je uvedeno, že pro axis=0 (vertikální sloučení) je chování join="inner" nebo join="outer" aplikováno na sloupce, což znamená, že pokud použijete join="inner", výsledný DataFrame bude obsahovat pouze ty sloupce, které se nachází v obou původních DataFramech. To je opačně než obvyklá praxe, kde join="inner" redukuje řádky na základě indexů nebo klíčů.
+
+V tomto konkrétním příkladu, kde je nastaveno axis=0 a join="inner", očekávali byste, že výsledek bude obsahovat řádky z obou DataFrameů sloučené dohromady (protože axis=0), ale pouze s těmi sloupci, které existují v obou DataFramech (kvůli join="inner"). Nicméně, protože pd.concat defaultně spojí všechny sloupce při vertikálním spojení a filtruje sloupce pouze při horizontálním spojení (axis=1), v praxi join="inner" není často používán s axis=0 v pd.concat, a může to vést k záměně nebo chybnému výkladu kódu.
+
+Vzhledem k tomu, že tento případ používá vertikální sloučení (axis=0), a pokud oba DataFramey obsahují stejné sloupce, měli byste dostat výsledek, který obsahuje všechny řádky z obou DataFrameů, ale pamatujte, že zachování join="inner" zde nemá očekávaný efekt omezení sloupců na průnik, jak by to bylo při použití axis=1.
