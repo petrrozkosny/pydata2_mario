@@ -13,3 +13,16 @@ datumy2[0] = pd.to_datetime(datumy2[0],format='%d-%m-%Y')
 # df3.rename(columns={0:'datum'},inplace=True)
 #df3.dtypes
 
+_____________________________________________________________________________________
+
+import pandas as pd
+
+df = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data.csv',delimiter=';')
+df_lokality = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data_lokality.csv',delimiter=';')
+
+df_spojeno  = df.merge(df_lokality, left_on='NAME', right_on='STANICE', how='left')
+
+df_agregovano = df.groupby('NAME')['TMAX'].max().reset_index()
+df_maxima = df_lokality.merge(df_agregovano, left_on='STANICE', right_on='NAME', how='left')
+
+df_maxima
