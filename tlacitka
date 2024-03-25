@@ -1,0 +1,61 @@
+import pandas as pd
+import ipywidgets as widgets  # Import knihovny ipywidgets pro práci s widgety
+from IPython.display import display  # Import funkce display pro zobrazování widgetů a výstupů
+import io 
+import time
+
+
+
+'''
+1. Kliknout na button a tím stáhnout data do dataframe
+1.1. V rámci stažení souboru dopočítáme sloupeček rok
+2. Po stáhnutí dat do dataframe mít možnost filtrovat NAME, ROK
+3. Zobrazit prvních 5 řádk df
+'''
+
+df = pd.DataFrame()
+output = widgets.Output()
+
+def stahni_data(change):
+    global df
+    df = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data.csv',delimiter=';')
+    df['ROK'] = pd.to_datetime(df['DATE']).dt.year
+    vyber_name.options = list(df['NAME'].unique())
+    vyber_name.disabled = False
+    tlacitko.description = 'Data stažena'
+        
+def filtruj_lokality(change):
+    global df
+    
+    if df.empty:
+        pass
+    else:    
+        with output:
+            output.clear_output()
+            df_filtr = df[df['NAME'] == vyber_name.value]
+            
+            vyber_rok.options = list(df_filtr['ROK'].unique())
+            vyber_rok.disabled = False
+
+def zobraz_data(change):
+    global df
+    if df.empty:
+        pass
+    else:
+        with output:
+            output.clear_output(wait=True)
+           
+            df_filtr = df[(df['NAME'] == vyber_name.value) & (df['ROK'] == vyber_rok.value)]
+            display(df_filtr.head())
+
+tlacitko = widgets.Button(description="Stáhnout data")
+
+vyber_name = widgets.Dropdown(options=[],disabled=True,description='Vyber lokalitu')
+vyber_rok = widgets.Dropdown(options=[],disabled=True,description='Vyber rok')
+
+tlacitko.on_click(stahni_data)
+
+vyber_name.observe(filtruj_lokality)
+vyber_rok.observe(zobraz_data)
+display(tlacitko,vyber_name,vyber_rok,output)
+
