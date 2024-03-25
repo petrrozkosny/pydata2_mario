@@ -26,3 +26,25 @@ df_agregovano = df.groupby('NAME')['TMAX'].max().reset_index()
 df_maxima = df_lokality.merge(df_agregovano, left_on='STANICE', right_on='NAME', how='left')
 
 df_maxima
+
+_______________________________________________________________________________________
+
+import pandas as pd
+df = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data.csv',delimiter=';')
+df_lokality = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data_lokality.csv',delimiter=';')
+df_ruzyne = df.loc[df['NAME'] == 'RUZYNE'].copy()
+df_mosnov = df.loc[df['NAME'] == 'MOSNOV'].copy()
+
+df_ruzyne['DATE'] = pd.to_datetime(df_ruzyne['DATE'])
+df_ruzyne['ROK'] = df_ruzyne['DATE'].dt.year
+df_ruzyne['MESIC'] = df_ruzyne['DATE'].dt.month
+
+df_pripojeno = pd.concat([df_ruzyne, df_mosnov])
+df_pripojeno = df_pripojeno.merge(df_lokality, left_on='NAME', right_on = 'STANICE',how='left')
+
+## Chceme rok a mesic jako integer
+df_pripojeno['ROK'] = df_pripojeno['ROK'].fillna(-1).astype(int)
+df_pripojeno['MESIC'] = df_pripojeno['MESIC'].fillna(-1).astype(int)
+
+
+df_pripojeno.dtypes
