@@ -1,0 +1,32 @@
+import pandas as pd
+df = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data.csv',delimiter=';')
+df_lokality = pd.read_csv('https://raw.githubusercontent.com/petrrozkosny/pydata/main/pydata_data_lokality.csv',delimiter=';')
+
+df['DATE'] = pd.to_datetime(df['DATE'])
+df['ROK'] = df['DATE'].dt.year
+df['MESIC'] = df['DATE'].dt.month
+
+df_agregovano = df.groupby(['ROK','NAME'])['PRCP'].sum().reset_index()
+
+
+
+
+
+import ipywidgets as widgets
+import matplotlib.pyplot as plt
+
+output = widgets.Output()
+def zobraz_graf(change):
+    lokalita = change.new
+    df_graf = df_agregovano[df_agregovano['NAME']==lokalita]
+    with output:
+        fig,ax = plt.subplots()
+        output.clear_output(wait = True)
+        plt.plot(df_graf['ROK'],df_graf['PRCP'])
+        ax.axhline(y=df_graf['PRCP'].mean(),color ='red')
+      
+        plt.xticks(df_graf['ROK'],rotation=90)
+vyber_lokality = widgets.Dropdown(options=df['NAME'].unique(),description='Lokalita:',disabled=False)
+
+vyber_lokality.observe(zobraz_graf,names='value')
+display(vyber_lokality,output)
